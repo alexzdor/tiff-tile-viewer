@@ -292,17 +292,15 @@ def _compute_zoom_range(meta: dict) -> tuple[int, int]:
 def _generate_tiles(input_path: str, tiles_dir: str,
                     zoom_min: int, zoom_max: int) -> None:
     """
-    Запускает gdal2tiles.py для генерации тайловой пирамиды XYZ.
+    Запускает gdal2tiles для генерации тайловой пирамиды XYZ.
+    Команда определяется функцией _find_gdal2tiles() кроссплатформенно.
     """
-    gdal2tiles_script = _find_gdal2tiles()
-
-    cmd = [
-        sys.executable, gdal2tiles_script,
+    cmd = _find_gdal2tiles() + [
         "--profile=mercator",
         f"--zoom={zoom_min}-{zoom_max}",
         "--resampling=average",
         "--tilesize=256",
-        "--webviewer=none",   # HTML-страницу формируем сами
+        "--webviewer=none",
         "--processes=1",
         input_path,
         tiles_dir,
@@ -313,7 +311,7 @@ def _generate_tiles(input_path: str, tiles_dir: str,
             cmd,
             capture_output=True,
             text=True,
-            timeout=600,   # 10 минут — жёсткий таймаут
+            timeout=600,
         )
     except subprocess.TimeoutExpired:
         raise RuntimeError(
@@ -328,39 +326,50 @@ def _generate_tiles(input_path: str, tiles_dir: str,
         )
 
 
-def _find_gdal2tiles() -> str:
-    """Ищет скрипт gdal2tiles.py в стандартных местах (Windows и Linux)."""
-    import sys
+def _find_gdal2tiles() -> list:
+    """
+    Возвращает команду запуска gdal2tiles в виде списка аргументов.
+    Работает на Windows, Linux и macOS.
+    """
+    import shutil
     import glob
 
-    # Сначала ищем рядом с текущим интерпретатором Python (Scripts/ на Windows)
+    # Вариант 1: запуск как Python-модуль (pip install gdal2tiles)
+    try:
+        r = subprocess.run(
+            [sys.executable, "-m", "gdal2tiles", "--version"],
+            capture_output=True, text=True
+        )
+        if r.returncode == 0:
+            return [sys.executable, "-m", "gdal2tiles"]
+    except Exception:
+        pass
+
+    # Вариант 2: gdal2tiles.py рядом с интерпретатором (Scripts/ на Windows)
     python_dir = os.path.dirname(sys.executable)
     scripts_dir = os.path.join(python_dir, "Scripts")
-
     candidates = [
         os.path.join(scripts_dir, "gdal2tiles.py"),
-        os.path.join(scripts_dir, "gdal2tiles.exe"),
-        os.path.join(python_dir, "gdal2tiles.py"),
-        # Linux/Mac стандартные пути
+        os.path.join(python_dir,  "gdal2tiles.py"),
         "/usr/bin/gdal2tiles.py",
         "/usr/local/bin/gdal2tiles.py",
     ]
-
     for path in candidates:
         if os.path.exists(path):
-            return path
+            return [sys.executable, path]
 
-    # Поиск по всей папке Python через glob
-    patterns = [
-        os.path.join(python_dir, "**", "gdal2tiles.py"),
-        os.path.join(python_dir, "**", "gdal2tiles.exe"),
-    ]
-    for pattern in patterns:
+    # Вариант 3: рекурсивный поиск по дереву Python
+    for pattern in [os.path.join(python_dir, "**", "gdal2tiles.py")]:
         found = glob.glob(pattern, recursive=True)
         if found:
-            return found[0]
+            return [sys.executable, found[0]]
+
+    # Вариант 4: gdal2tiles как исполняемый файл в PATH
+    exe = shutil.which("gdal2tiles") or shutil.which("gdal2tiles.py")
+    if exe:
+        return [exe]
 
     raise RuntimeError(
-        "Не удалось найти gdal2tiles.py. "
-        "Попробуйте выполнить в командной строке: pip install gdal2tiles"
+        "Не удалось найти gdal2tiles. "
+        "Выполните в командной строке: pip install gdal2tiles"
     )

@@ -8,16 +8,14 @@
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
     :root {
-      --bg:        #0f0f1a;
-      --surface:   #1a1a2e;
-      --border:    #2a2a4a;
-      --accent:    #e94560;
-      --accent2:   #0f3460;
-      --text:      #e0e0e0;
-      --muted:     #888;
-      --success:   #4caf50;
-      --error:     #f44336;
-      --radius:    12px;
+      --bg:      #0f0f1a;
+      --surface: #1a1a2e;
+      --border:  #2a2a4a;
+      --accent:  #e94560;
+      --text:    #e0e0e0;
+      --muted:   #888;
+      --error:   #f44336;
+      --radius:  12px;
     }
 
     body {
@@ -31,23 +29,9 @@
       padding: 40px 20px;
     }
 
-    header {
-      text-align: center;
-      margin-bottom: 40px;
-    }
-
-    header h1 {
-      font-size: 1.8rem;
-      font-weight: 700;
-      color: var(--accent);
-      margin-bottom: 8px;
-    }
-
-    header p {
-      color: var(--muted);
-      font-size: 0.95rem;
-      max-width: 500px;
-    }
+    header { text-align: center; margin-bottom: 40px; }
+    header h1 { font-size: 1.8rem; font-weight: 700; color: var(--accent); margin-bottom: 8px; }
+    header p  { color: var(--muted); font-size: 0.95rem; max-width: 500px; }
 
     .card {
       background: var(--surface);
@@ -58,7 +42,7 @@
       max-width: 560px;
     }
 
-    /* ── Зона перетаскивания ── */
+    /* Зона перетаскивания */
     #drop-zone {
       border: 2px dashed var(--border);
       border-radius: var(--radius);
@@ -68,168 +52,46 @@
       transition: border-color 0.2s, background 0.2s;
       position: relative;
     }
-
-    #drop-zone.hover {
-      border-color: var(--accent);
-      background: rgba(233, 69, 96, 0.05);
-    }
-
+    #drop-zone.hover { border-color: var(--accent); background: rgba(233,69,96,0.05); }
     #drop-zone input[type="file"] {
-      position: absolute;
-      inset: 0;
-      opacity: 0;
-      cursor: pointer;
-      width: 100%;
-      height: 100%;
+      position: absolute; inset: 0; opacity: 0; cursor: pointer; width: 100%; height: 100%;
     }
+    #drop-zone .icon  { font-size: 2.5rem; margin-bottom: 12px; }
+    #drop-zone .label { font-size: 1rem; font-weight: 500; margin-bottom: 6px; }
+    #drop-zone .hint  { font-size: 0.8rem; color: var(--muted); }
 
-    #drop-zone .icon { font-size: 2.5rem; margin-bottom: 12px; }
+    #file-name { margin-top: 14px; font-size: 0.85rem; color: var(--accent); min-height: 1.2em; text-align: center; }
 
-    #drop-zone .label {
-      font-size: 1rem;
-      font-weight: 500;
-      margin-bottom: 6px;
+    /* Кнопка */
+    #submit-btn {
+      margin-top: 20px; width: 100%; padding: 14px;
+      background: var(--accent); color: #fff;
+      border: none; border-radius: 8px;
+      font-size: 1rem; font-weight: 600;
+      cursor: pointer; transition: opacity 0.2s;
     }
+    #submit-btn:hover    { opacity: 0.85; }
+    #submit-btn:disabled { opacity: 0.4; cursor: not-allowed; }
 
-    #drop-zone .hint {
-      font-size: 0.8rem;
-      color: var(--muted);
+    /* Спиннер */
+    #spinner { display: none; margin-top: 28px; text-align: center; }
+    .spin {
+      display: inline-block; width: 40px; height: 40px;
+      border: 4px solid var(--border);
+      border-top-color: var(--accent);
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
     }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    #spinner p { margin-top: 12px; color: var(--muted); font-size: 0.9rem; }
 
-    #file-name {
-      margin-top: 14px;
-      font-size: 0.85rem;
-      color: var(--accent);
-      min-height: 1.2em;
-      text-align: center;
-    }
-
-    /* ── Кнопка ── */
-    button#submit-btn {
-      margin-top: 20px;
-      width: 100%;
-      padding: 14px;
-      background: var(--accent);
-      color: #fff;
-      border: none;
-      border-radius: 8px;
-      font-size: 1rem;
-      font-weight: 600;
-      cursor: pointer;
-      transition: opacity 0.2s;
-    }
-
-    button#submit-btn:hover { opacity: 0.85; }
-    button#submit-btn:disabled { opacity: 0.4; cursor: not-allowed; }
-
-    /* ── Прогресс ── */
-    #progress-section { display: none; margin-top: 28px; }
-
-    .progress-bar-wrap {
-      background: var(--border);
-      border-radius: 999px;
-      height: 8px;
-      overflow: hidden;
-      margin-bottom: 10px;
-    }
-
-    .progress-bar-fill {
-      height: 100%;
-      background: var(--accent);
-      border-radius: 999px;
-      width: 0%;
-      transition: width 0.4s;
-    }
-
-    #status-text {
-      font-size: 0.85rem;
-      color: var(--muted);
-      text-align: center;
-    }
-
-    /* ── Результат ── */
-    #result-section { display: none; margin-top: 28px; }
-
-    #result-section h2 {
-      font-size: 1rem;
-      font-weight: 600;
-      margin-bottom: 14px;
-      color: var(--success);
-    }
-
-    .result-info {
-      background: rgba(255,255,255,0.04);
-      border-radius: 8px;
-      padding: 14px 16px;
-      font-size: 0.82rem;
-      line-height: 1.8;
-      margin-bottom: 16px;
-      font-family: monospace;
-    }
-
-    .btn-group { display: flex; gap: 10px; flex-direction: column; }
-
-    .btn {
-      display: block;
-      width: 100%;
-      padding: 12px;
-      border-radius: 8px;
-      border: none;
-      font-size: 0.9rem;
-      font-weight: 600;
-      cursor: pointer;
-      text-align: center;
-      text-decoration: none;
-      transition: opacity 0.2s;
-    }
-
-    .btn:hover { opacity: 0.85; }
-
-    .btn-primary   { background: var(--success);  color: #fff; }
-    .btn-secondary { background: var(--accent2);  color: #fff; }
-    .btn-outline   { background: transparent; color: var(--text);
-                     border: 1px solid var(--border); }
-
-    /* ── Ошибка ── */
-    #error-section {
-      display: none;
-      margin-top: 20px;
-      background: rgba(244, 67, 54, 0.1);
-      border: 1px solid rgba(244, 67, 54, 0.4);
-      border-radius: 8px;
-      padding: 14px 16px;
-      font-size: 0.85rem;
-      color: #f44336;
-      line-height: 1.5;
-    }
-
-    /* ── Карта ── */
-    #map-container {
-      display: none;
-      width: 100%;
-      max-width: 1100px;
-      margin-top: 32px;
-    }
-
-    #map-container h2 {
-      font-size: 1.1rem;
-      font-weight: 600;
-      margin-bottom: 12px;
-      color: var(--text);
-    }
-
-    #map-frame {
-      width: 100%;
-      height: 600px;
-      border: 1px solid var(--border);
-      border-radius: var(--radius);
-      background: #111;
-    }
-
-    /* ── Ещё один файл ── */
-    #reset-btn {
-      margin-top: 14px;
-      display: none;
+    /* Ошибка */
+    #error-box {
+      display: none; margin-top: 20px;
+      background: rgba(244,67,54,0.1);
+      border: 1px solid rgba(244,67,54,0.4);
+      border-radius: 8px; padding: 14px 16px;
+      font-size: 0.85rem; color: var(--error); line-height: 1.5;
     }
   </style>
 </head>
@@ -237,188 +99,103 @@
 
 <header>
   <h1>📡 GeoTIFF Viewer</h1>
-  <p>Загрузите геопривязанный файл GeoTIFF — система автоматически создаст интерактивную веб-карту.</p>
+  <p>Загрузите геопривязанный файл GeoTIFF — система создаст интерактивную веб-карту.</p>
 </header>
 
 <div class="card">
 
-  <!-- Форма загрузки -->
-  <div id="upload-section">
-    <div id="drop-zone">
-      <input type="file" id="file-input" accept=".tif,.tiff">
-      <div class="icon">🗺️</div>
-      <div class="label">Перетащите файл сюда или нажмите для выбора</div>
-      <div class="hint">Поддерживается: GeoTIFF (.tif, .tiff) · до 500 МБ</div>
-    </div>
-    <div id="file-name"></div>
-    <button id="submit-btn" disabled>Загрузить и обработать</button>
+  <div id="drop-zone">
+    <input type="file" id="file-input" accept=".tif,.tiff">
+    <div class="icon">🗺️</div>
+    <div class="label">Перетащите файл сюда или нажмите для выбора</div>
+    <div class="hint">Поддерживается: GeoTIFF (.tif, .tiff) · до 500 МБ</div>
   </div>
+  <div id="file-name"></div>
+  <button id="submit-btn" disabled>Загрузить и обработать</button>
 
-  <!-- Прогресс -->
-  <div id="progress-section">
-    <div class="progress-bar-wrap">
-      <div class="progress-bar-fill" id="progress-fill"></div>
-    </div>
-    <div id="status-text">Загрузка файла…</div>
+  <!-- Спиннер во время обработки -->
+  <div id="spinner">
+    <div class="spin"></div>
+    <p>Файл обрабатывается, пожалуйста подождите…</p>
   </div>
 
   <!-- Ошибка -->
-  <div id="error-section"></div>
+  <div id="error-box"></div>
 
-  <!-- Результат -->
-  <div id="result-section">
-    <h2>✅ Обработка завершена</h2>
-    <div class="result-info" id="result-info"></div>
-    <div class="btn-group">
-      <button class="btn btn-primary" id="open-map-btn">Открыть карту ниже</button>
-      <a class="btn btn-secondary" id="download-btn" href="#">Скачать архив тайлов (.zip)</a>
-      <button class="btn btn-outline" id="reset-btn2">Загрузить другой файл</button>
-    </div>
-  </div>
-
-</div>
-
-<!-- Карта -->
-<div id="map-container">
-  <h2>Интерактивная карта</h2>
-  <iframe id="map-frame" src="" frameborder="0" allowfullscreen></iframe>
 </div>
 
 <script>
-  // ── Состояние ──
-  let selectedFile = null;
-  let currentTaskId = null;
+  var selectedFile = null;
 
-  // ── Элементы ──
-  const dropZone    = document.getElementById('drop-zone');
-  const fileInput   = document.getElementById('file-input');
-  const fileNameEl  = document.getElementById('file-name');
-  const submitBtn   = document.getElementById('submit-btn');
+  var dropZone  = document.getElementById('drop-zone');
+  var fileInput = document.getElementById('file-input');
+  var fileNameEl = document.getElementById('file-name');
+  var submitBtn = document.getElementById('submit-btn');
+  var spinner   = document.getElementById('spinner');
+  var errorBox  = document.getElementById('error-box');
 
-  const uploadSection   = document.getElementById('upload-section');
-  const progressSection = document.getElementById('progress-section');
-  const progressFill    = document.getElementById('progress-fill');
-  const statusText      = document.getElementById('status-text');
-  const errorSection    = document.getElementById('error-section');
-  const resultSection   = document.getElementById('result-section');
-  const resultInfo      = document.getElementById('result-info');
-  const mapContainer    = document.getElementById('map-container');
-  const mapFrame        = document.getElementById('map-frame');
-  const openMapBtn      = document.getElementById('open-map-btn');
-  const downloadBtn     = document.getElementById('download-btn');
-  const resetBtn2       = document.getElementById('reset-btn2');
-
-  // ── Drag & Drop ──
-  dropZone.addEventListener('dragover', e => { e.preventDefault(); dropZone.classList.add('hover'); });
-  dropZone.addEventListener('dragleave', () => dropZone.classList.remove('hover'));
-  dropZone.addEventListener('drop', e => {
-    e.preventDefault();
+  // Drag & Drop
+  dropZone.addEventListener('dragover', function(e) {
+    e.preventDefault(); dropZone.classList.add('hover');
+  });
+  dropZone.addEventListener('dragleave', function() {
     dropZone.classList.remove('hover');
-    const f = e.dataTransfer.files[0];
+  });
+  dropZone.addEventListener('drop', function(e) {
+    e.preventDefault(); dropZone.classList.remove('hover');
+    var f = e.dataTransfer.files[0];
     if (f) setFile(f);
   });
-
-  fileInput.addEventListener('change', () => {
+  fileInput.addEventListener('change', function() {
     if (fileInput.files[0]) setFile(fileInput.files[0]);
   });
 
   function setFile(f) {
     selectedFile = f;
-    fileNameEl.textContent = `Выбран файл: ${f.name} (${(f.size / 1024 / 1024).toFixed(1)} МБ)`;
+    fileNameEl.textContent = 'Выбран файл: ' + f.name +
+      ' (' + (f.size / 1024 / 1024).toFixed(1) + ' МБ)';
     submitBtn.disabled = false;
+    errorBox.style.display = 'none';
   }
 
-  // ── Отправка ──
-  submitBtn.addEventListener('click', () => {
+  // Отправка
+  submitBtn.addEventListener('click', function() {
     if (!selectedFile) return;
-    uploadFile(selectedFile);
+
+    // Показываем спиннер, блокируем кнопку
+    submitBtn.disabled = true;
+    spinner.style.display = 'block';
+    errorBox.style.display = 'none';
+
+    var formData = new FormData();
+    formData.append('file', selectedFile);
+
+    fetch('/upload', { method: 'POST', body: formData })
+      .then(function(resp) {
+        if (resp.ok) {
+          // Сервер вернул HTML карты — открываем его вместо текущей страницы
+          return resp.text().then(function(html) {
+            document.open();
+            document.write(html);
+            document.close();
+          });
+        } else {
+          // Читаем текст ошибки из JSON
+          return resp.json().then(function(data) {
+            showError(data.detail || ('Ошибка сервера: ' + resp.status));
+          });
+        }
+      })
+      .catch(function(err) {
+        showError('Не удалось связаться с сервером: ' + err.message);
+      });
   });
 
-  async function uploadFile(file) {
-    // Скрываем форму, показываем прогресс
-    uploadSection.style.display = 'none';
-    progressSection.style.display = 'block';
-    errorSection.style.display = 'none';
-    resultSection.style.display = 'none';
-
-    setProgress(10, 'Загрузка файла на сервер…');
-
-    const formData = new FormData();
-    formData.append('file', file);
-
-    let data;
-    try {
-      const resp = await fetch('/upload', { method: 'POST', body: formData });
-      data = await resp.json();
-
-      if (!resp.ok) {
-        throw new Error(data.detail || `Ошибка сервера: ${resp.status}`);
-      }
-    } catch (err) {
-      showError(err.message);
-      return;
-    }
-
-    // Обработка уже выполнена синхронно на сервере
-    if (data.status === 'done') {
-      currentTaskId = data.task_id;
-      setProgress(100, 'Обработка завершена.');
-      showResult(data);
-    } else if (data.status === 'error') {
-      showError(data.error_message || 'Неизвестная ошибка обработки.');
-    } else {
-      showError('Неожиданный ответ сервера.');
-    }
-  }
-
-  function setProgress(pct, text) {
-    progressFill.style.width = pct + '%';
-    statusText.textContent = text;
-  }
-
   function showError(msg) {
-    progressSection.style.display = 'none';
-    uploadSection.style.display = 'block';
-    errorSection.style.display = 'block';
-    errorSection.textContent = '⚠️ ' + msg;
-  }
-
-  function showResult(data) {
-    progressSection.style.display = 'none';
-    resultSection.style.display = 'block';
-
-    const [west, south, east, north] = data.bbox;
-    resultInfo.innerHTML = [
-      `Задача: ${data.task_id.slice(0, 8)}…`,
-      `Охват:  ${west.toFixed(5)}° – ${east.toFixed(5)}° (долгота)`,
-      `        ${south.toFixed(5)}° – ${north.toFixed(5)}° (широта)`,
-      `Уровни масштабирования: ${data.zoom_min} – ${data.zoom_max}`,
-    ].join('\n');
-
-    downloadBtn.href = `/download/${data.task_id}`;
-    openMapBtn.onclick = () => openMap(data.task_id);
-  }
-
-  function openMap(taskId) {
-    mapContainer.style.display = 'block';
-    mapFrame.src = `/result/${taskId}`;
-    mapContainer.scrollIntoView({ behavior: 'smooth' });
-  }
-
-  resetBtn2.addEventListener('click', reset);
-
-  function reset() {
-    selectedFile = null;
-    currentTaskId = null;
-    fileInput.value = '';
-    fileNameEl.textContent = '';
-    submitBtn.disabled = true;
-    uploadSection.style.display = 'block';
-    progressSection.style.display = 'none';
-    resultSection.style.display = 'none';
-    errorSection.style.display = 'none';
-    mapContainer.style.display = 'none';
-    mapFrame.src = '';
+    spinner.style.display = 'none';
+    submitBtn.disabled = false;
+    errorBox.style.display = 'block';
+    errorBox.textContent = '⚠️ ' + msg;
   }
 </script>
 </body>
