@@ -42,7 +42,7 @@ geotiff_viewer/
 │   └── index.html   # форма загрузки
 ├── uploads/         # временные загруженные файлы (авто)
 ├── tiles/           # сгенерированные тайлы (авто)
-└── requirements.txt #(ВАЖНО!! numpy < 2)
+└── requirements.txt #(ВАЖНО!!! numpy < 2)
 ```
 
 ## API
