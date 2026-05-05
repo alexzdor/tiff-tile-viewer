@@ -47,10 +47,6 @@ app = FastAPI(
 @app.get("/tiles/{session_id}/{z}/{x}/{filename}")
 async def serve_tile(session_id: str, z: int, x: int, filename: str):
     tile_path = os.path.join(TILES_DIR, session_id, str(z), str(x), filename)
-    print("ИЩУ:", tile_path)
-    print("СУЩЕСТВУЕТ:", os.path.exists(tile_path))
-    print("ПАПКА z:", os.path.exists(os.path.join(TILES_DIR, session_id, str(z))))
-    print("ПАПКА x:", os.path.exists(os.path.join(TILES_DIR, session_id, str(z), str(x))))
     if not os.path.isfile(tile_path):
         raise HTTPException(status_code=404, detail="Тайл не найден.")
     return FileResponse(tile_path, media_type="image/png")
