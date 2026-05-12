@@ -5,6 +5,8 @@ main.py — FastAPI-приложение.
   GET   /                    — главная страница (форма загрузки)
   POST  /upload              — загрузка GeoTIFF, обработка, возврат HTML-карты
   GET   /download/{session}  — скачивание ZIP-архива сгенерированных тайлов
+  GET   /tiles/{session_id}/{z}/{x}/{filename} - возвращает отдельный тайл PNG по его координатам в тайловой пирамиде.
+
 """
 
 import os
@@ -74,7 +76,7 @@ async def upload(file: UploadFile = File(...)):
     # Валидация расширения
     filename = file.filename or ""
     ext = os.path.splitext(filename)[1].lower()
-    if ext not in ALLOWED_EXTENSIONS:
+    if ext not in ALLOWED_EXTENSIONS:       #.tif / .tiff
         raise HTTPException(
             status_code=400,
             detail=(
@@ -102,6 +104,7 @@ async def upload(file: UploadFile = File(...)):
     tiles_dir  = os.path.join(TILES_DIR,   session_id)
     os.makedirs(upload_dir, exist_ok=True)
     os.makedirs(tiles_dir,  exist_ok=True)
+
 
     upload_path = os.path.join(upload_dir, filename)
     with open(upload_path, "wb") as f_out:
