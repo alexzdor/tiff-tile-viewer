@@ -98,6 +98,9 @@ def _open_and_validate(path: str):
         raise RuntimeError(f"Файл не найден: {path}")
 
     try:
+        # Попытка открыть файл через gdal.Open
+        # Возвращает GDALDataset: размер изображения, геогр. привязка,
+        # система координат, пиксели
         ds = gdal.Open(path, gdal.GA_ReadOnly)
     except Exception as e:
         raise RuntimeError(f"Не удалось открыть файл как растр: {e}")
@@ -108,8 +111,11 @@ def _open_and_validate(path: str):
             "Убедитесь, что загружен файл формата GeoTIFF (.tif / .tiff)."
         )
 
-    # Проверка наличия геопривязки
+    # Проверка наличия геопривязки к координатам
+    # Шесть параметров
     gt = ds.GetGeoTransform()
+
+    #Система координат, WGS 84/EPSG:4326 или любая другая проекция
     proj = ds.GetProjection()
 
     # Трансформация по умолчанию (без привязки): (0,1,0,0,0,1)
@@ -140,6 +146,7 @@ def _open_and_validate(path: str):
             "Поддерживаются файлы с 1 (оттенки серого), 3 (RGB) или 4 (RGBA) каналами."
         )
 
+    #Возвращает GDAL Dataset
     return ds
 
 
@@ -148,12 +155,22 @@ def _extract_metadata(ds) -> dict:
     Извлекает метаданные из открытого датасета GDAL.
     Возвращает словарь с ключами: crs_wkt, bbox_wgs84, pixel_size_deg,
     width, height, n_bands, epsg.
+
+    WKT (Well-Known Text) — это текстовый формат описания геометрии и систем координат.
     """
+    # Шесть параметров
+    # Аффинное преобразование между координатами пикселя 
+    # (колонка, строка) и географическими координатами (X, Y).
     gt = ds.GetGeoTransform()
+
+    # Система координат, WGS 84/EPSG:4326 или любая другая проекция
     proj = ds.GetProjection()
+
+    # Размеры растра в пикселях
     width = ds.RasterXSize
     height = ds.RasterYSize
 
+    # Coordinate Reference System (система координат)
     # Координаты угловых точек в исходной CRS
     x_min = gt[0]
     y_max = gt[3]
@@ -243,6 +260,7 @@ def _reproject_if_needed(input_path: str, meta: dict) -> str:
             resampleAlg=gdal.GRA_Bilinear,
             format="GTiff",
         )
+        # Перепроецирование в WGS 84 (EPSG:4326)
         result = gdal.Warp(output_path, input_path, options=warp_options)
         if result is None:
             raise RuntimeError("gdal.Warp вернул None.")
@@ -252,6 +270,7 @@ def _reproject_if_needed(input_path: str, meta: dict) -> str:
             f"Не удалось перепроецировать файл в WGS-84 (EPSG:4326): {e}"
         )
 
+    # Возвращает путь к репроецированному файлу
     return output_path
 
 
@@ -294,6 +313,9 @@ def _generate_tiles(input_path: str, tiles_dir: str,
     """
     Запускает gdal2tiles для генерации тайловой пирамиды XYZ.
     Команда определяется функцией _find_gdal2tiles() кроссплатформенно.
+    Тайлы в проекции Web Mercator
+    Не генерируется HTML файлы от gdal2tiles, делаем свой
+    Один процесс, без параллельности
     """
     cmd = _find_gdal2tiles() + [
         "--profile=mercator",
