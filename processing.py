@@ -5,7 +5,7 @@ processing.py — вычислительный модуль.
 1. Открытие и валидацию файла GeoTIFF через GDAL.
 2. Извлечение метаданных (CRS, bbox, разрешение, число каналов).
 3. Репроецирование в Web Mercator (EPSG:3857) при необходимости.
-4. Генерацию тайловой пирамиды XYZ с помощью gdal2tiles.
+4. Генерацию тайловой пирамиды TMS с помощью gdal2tiles.
 5. Определение диапазона уровней масштабирования.
 """
 
@@ -62,6 +62,9 @@ def process_geotiff(input_path: str, tiles_dir: str) -> dict:
 
     # Шаг 3: Репроецирование в WGS-84 (если необходимо)
     working_path = _reproject_if_needed(input_path, meta)
+
+    # Шаг 3.5: Перевод в 8-бит
+    #working_path = _convert_to_byte_if_needed(working_path)
 
     # Шаг 4: Определение диапазона уровней масштабирования
     zoom_min, zoom_max = _compute_zoom_range(meta)
@@ -328,6 +331,11 @@ def _generate_tiles(input_path: str, tiles_dir: str,
         tiles_dir,
     ]
 
+    # gdal2tiles не принимает многие GeoTIFF файлы, если:
+    # файл не 8-и битный (тип пикселей не Byte)
+
+
+
     try:
         result = subprocess.run(
             cmd,
@@ -395,3 +403,35 @@ def _find_gdal2tiles() -> list:
         "Не удалось найти gdal2tiles. "
         "Выполните в командной строке: pip install gdal2tiles"
     )
+
+def _convert_to_byte_if_needed(path: str) -> str:
+    ds = gdal.Open(path)
+    band = ds.GetRasterBand(1)
+    dtype = band.DataType
+    ds = None
+
+    # 1—Byte, 2—UInt16, 3—Int16, 4—UInt32, 5—Int32, 6—Float32, 7—Float64
+    if dtype == gdal.GDT_Byte:
+        return path  # уже годится
+
+    temp_vrt = path + ".vrt"
+    translated = path + "_byte.tif"
+
+    # Создаём VRT с автоматическим масштабированием
+    gdal.Translate(
+        temp_vrt,
+        path,
+        format="VRT",
+        outputType=gdal.GDT_Byte,
+        scaleParams=[]  # auto-scale
+    )
+
+    gdal.Translate(
+        translated,
+        temp_vrt,
+        format="GTiff",
+        outputType=gdal.GDT_Byte,
+    )
+
+    os.remove(temp_vrt)
+    return translated
