@@ -262,6 +262,7 @@ def _reproject_if_needed(input_path: str, meta: dict) -> str:
             dstSRS="EPSG:4326",
             resampleAlg=gdal.GRA_Bilinear,
             format="GTiff",
+            dstNodata=0,
         )
         # Перепроецирование в WGS 84 (EPSG:4326)
         result = gdal.Warp(output_path, input_path, options=warp_options)
@@ -327,6 +328,7 @@ def _generate_tiles(input_path: str, tiles_dir: str,
         "--tilesize=256",
         "--webviewer=none",
         "--processes=1",
+        "--srcnodata=0",
         input_path,
         tiles_dir,
     ]

@@ -116,11 +116,12 @@ def build_map_html(
       zoom: {initial_zoom},
       minZoom: {zoom_min},
       maxZoom: {zoom_max},
+      attributionControl: false,
     }});
 
     // Подложка OpenStreetMap
     var osm = L.tileLayer('https://{{s}}.tile.openstreetmap.org/{{z}}/{{x}}/{{y}}.png', {{
-      attribution: '© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>',
+      attribution: ' ',
       opacity: 0.4,
     }}).addTo(map);
 
@@ -136,7 +137,7 @@ def build_map_html(
     var bounds = L.latLngBounds([{south}, {west}], [{north}, {east}]);
     map.setMaxBounds(bounds.pad(0.5));
 
-    L.rectangle(bounds, {{ color: '#e94560', weight: 2, fill: false }}).addTo(map);
+    //L.rectangle(bounds, {{ color: '#e94560', weight: 2, fill: false }}).addTo(map);
 
     L.control.layers(
       {{ 'OpenStreetMap': osm }},
