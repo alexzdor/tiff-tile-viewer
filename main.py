@@ -73,7 +73,7 @@ async def upload(file: UploadFile = File(...)):
     HTTP 422 — ошибка обработки (некорректный GeoTIFF и т.п.).
     HTTP 500 — внутренняя ошибка сервера.
     """
-    # Валидация расширения
+    # Валидация расширения(проверка)
     filename = file.filename or ""
     ext = os.path.splitext(filename)[1].lower()
     if ext not in ALLOWED_EXTENSIONS:       #.tif / .tiff
@@ -112,6 +112,7 @@ async def upload(file: UploadFile = File(...)):
 
     # Обработка: GDAL + gdal2tiles
     try:
+        #вызов
         result = processing.process_geotiff(upload_path, tiles_dir)
     except RuntimeError as e:
         _cleanup(upload_dir, tiles_dir)
@@ -136,7 +137,7 @@ async def upload(file: UploadFile = File(...)):
         zoom_max=result["zoom_max"],
         session_id=session_id,
     )
-
+    # Возвращение html браузеру
     return HTMLResponse(content=map_html)
 
 
